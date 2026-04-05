@@ -2,6 +2,9 @@
 
 A cloud-based complaint management system built using Flask and AWS.
 
+## Live Demo
+http://complaint-env.eba-mfrqfvxx.eu-north-1.elasticbeanstalk.com
+
 ## Features
 - User Registration & Login
 - Submit Complaint with Image
