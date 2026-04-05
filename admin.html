@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+<h1 style="text-align:center;">Admin Dashboard</h1>
+<h2 style="text-align:center; color:#333;">
+Cloud Complaint Management System
+</h2>
+
+<button onclick="loadComplaints()" style="
+    display:block;
+    margin:20px auto;
+    padding:10px 20px;
+    background:#007bff;
+    color:white;
+    border:none;
+    border-radius:5px;
+">
+Load Complaints
+</button>
+<button onclick="logout()" style="
+    position:absolute;
+    top:20px;
+    right:20px;
+    padding:8px 15px;
+    background:red;
+    color:white;
+    border:none;
+    border-radius:5px;
+">
+Logout
+</button>
+<div id="complaints"></div>
+
+<script>
+async function loadComplaints() {
+    const res = await fetch("/view_complaints");
+    const data = await res.json();
+
+    let html = "";
+
+    data.forEach(c => {
+        let color = c[5] === "Resolved" ? "green" : "red";
+
+        html += `
+            <div style="
+                background:white;
+                padding:15px;
+                margin:15px;
+                border-radius:10px;
+                box-shadow:0 2px 10px rgba(0,0,0,0.1);
+            ">
+                <h3>${c[2]}</h3>
+                <p>${c[3]}</p>
+
+                <img src="${c[4]}" width="200"/>
+
+                <p style="color:${color}; font-weight:bold;">
+                    Status: ${c[5]}
+                </p>
+
+                <button onclick="updateStatus(${c[0]})" style="
+                    background:green;
+                    color:white;
+                    padding:8px;
+                    border:none;
+                    border-radius:5px;
+                ">
+                    Mark Resolved
+                </button>
+            </div>
+        `;
+    });
+
+    document.getElementById("complaints").innerHTML = html;
+}
+
+async function updateStatus(id){
+    await fetch("/update-status", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            id: id,
+            status: "Resolved"
+        })
+    });
+
+    alert("Status Updated!");
+    loadComplaints();
+}
+
+function logout(){
+    window.location.href = "/";
+}
+
+</script>
+
+</body>
+</html>

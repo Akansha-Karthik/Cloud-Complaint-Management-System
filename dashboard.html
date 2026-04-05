@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f6f9;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        input, textarea {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .complaint {
+            background: white;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        img {
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Welcome to Dashboard </h1>
+<h2 style="text-align:center; color:#333;">
+Cloud Complaint Management System
+</h2>
+
+<form id="complaintForm" enctype="multipart/form-data">
+    <input type="text" name="title" placeholder="Complaint Title" required>
+    <textarea name="description" placeholder="Describe your issue..." required></textarea>
+    <input type="file" name="file" required>
+    <input type="hidden" name="user_id" value="1">
+    <button type="submit">Submit Complaint</button>
+</form>
+
+<button onclick="loadComplaints()">View Complaints</button>
+<button onclick="logout()" style="
+    position:absolute;
+    top:20px;
+    right:20px;
+    padding:8px 15px;
+    background:red;
+    color:white;
+    border:none;
+    border-radius:5px;
+">
+Logout
+</button>
+
+<div id="complaints"></div>
+
+<script>
+document.getElementById("complaintForm").onsubmit = async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    const res = await fetch("/add-complaint", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await res.json();
+    alert(data.message || data.error);
+};
+
+// Load complaints
+async function loadComplaints() {
+    const res = await fetch("/view_complaints");
+    const data = await res.json();
+
+    let html = "";
+
+    data.forEach(c => {
+        html += `
+            <div class="complaint">
+                <h3>${c[2]}</h3>
+                <p>${c[3]}</p>
+                <img src="${c[4]}" width="250"/>
+                <p><b>Status:</b> ${c[5]}</p>
+
+            </div>
+        `;
+    });
+
+    document.getElementById("complaints").innerHTML = html;
+}
+
+async function updateStatus(id){
+    const res = await fetch("/update-status", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            id: id,
+            status: "Resolved"
+        })
+    });
+
+    const data = await res.json();
+    alert(data.message);
+    location.reload();
+}
+
+function logout(){
+    window.location.href = "/";
+}
+
+
+</script>
+
+</body>
+</html>

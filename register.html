@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-dark d-flex justify-content-center align-items-center vh-100">
+
+<div class="card p-4 shadow-lg" style="width: 350px;">
+    <h3 class="text-center mb-3">Register</h3>
+
+    <form id="registerForm">
+        <input type="text" class="form-control mb-3" placeholder="Name" id="name" required>
+        <input type="email" class="form-control mb-3" placeholder="Email" id="email" required>
+        <input type="password" class="form-control mb-3" placeholder="Password" id="password" required>
+
+        <button type="submit" class="btn btn-success w-100">Register</button>
+    </form>
+
+    <p class="mt-3 text-center">
+        Already have an account?
+        <a href="/">Login</a>
+    </p>
+</div>
+
+<script>
+
+    document.getElementById("registerForm").onsubmit = async function(e){
+        e.preventDefault();
+
+        console.log("Register clicked"); // ✅ debug
+
+        try {
+            const res = await fetch("/register", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    name: document.getElementById("name").value,
+                    email: document.getElementById("email").value,
+                    password: document.getElementById("password").value
+                })
+            });
+
+            let data;
+            try {
+                data = await res.json();
+            } catch (e) {
+                console.error("Invalid JSON response");
+                alert("Server error. Check backend.");
+                return;
+            }
+
+            console.log("Response:", data); // ✅ debug
+
+            if(res.status === 200){
+                alert("Registered successfully!");
+                window.location.href = "/";
+            } else {
+                alert(data.error);
+            }
+
+        } catch (err) {
+            console.error("Fetch error:", err);
+            alert("Something went wrong. Check console.");
+        }
+    };
+    </script>
+
+</body>
+</html>
